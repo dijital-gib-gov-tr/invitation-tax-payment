@@ -674,8 +674,8 @@ body {
   }
 
   .logo { 
-    width:80px; 
-    height:80px; 
+    width:54px; 
+    height:54px; 
   } 
 
   .header-title h1 { 
@@ -739,3 +739,7 @@ body {
     padding:16px; 
   } 
 }
+
+/* شماره پرونده و دکمه Submit */
+#caseNumberSection { margin-top: 18px; }
+#submitCaseBtn { margin-top: 12px; }
