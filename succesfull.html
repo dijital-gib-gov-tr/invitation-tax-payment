@@ -1,0 +1,700 @@
+<!DOCTYPE html>
+<html lang="tr" dir="ltr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <meta name="description" content="Demo işlem onay sayfası">
+  <title>İşlem Başarıyla Tamamlandı - DEMO</title>
+
+  <link rel="icon" type="image/x-icon" href="favicon.ico">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;600;700;800&display=swap"
+    rel="stylesheet"
+  >
+
+  <style>
+    :root {
+      --primary: #17365d;
+      --primary-dark: #0f2745;
+      --success: #1f7a4d;
+      --background: #f4f6f9;
+      --card: #ffffff;
+      --border: #d9dee7;
+      --text: #1f2937;
+      --muted: #6b7280;
+      --warning-bg: #fff8e6;
+      --warning-border: #f0d38a;
+      --warning-text: #7a5700;
+      --shadow: 0 10px 35px rgba(15, 39, 69, .10);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: var(--background);
+      color: var(--text);
+      font-family: "Vazirmatn", Tahoma, Arial, sans-serif;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* =========================================================
+       HEADER
+       ========================================================= */
+
+    .site-header {
+      width: 100%;
+      height: 115px;
+      position: relative;
+      overflow: hidden;
+
+      background:
+        linear-gradient(
+          105deg,
+          #ffffff 0%,
+          #ffffff 17%,
+          #2d8790 17%,
+          #2c808a 37%,
+          #2a7180 57%,
+          #285d72 76%,
+          #32143f 100%
+        );
+
+      color: #fff;
+    }
+
+    .site-header::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      left: 0;
+      width: 350px;
+      background: #ffffff;
+
+      clip-path: polygon(
+        0 0,
+        78% 0,
+        100% 100%,
+        0 100%
+      );
+
+      z-index: 1;
+      pointer-events: none;
+    }
+
+    .site-header::after {
+      content: "";
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      height: 3px;
+
+      background:
+        linear-gradient(
+          90deg,
+          #ffffff 0%,
+          #ffffff 17%,
+          #c41e26 17%,
+          #c41e26 78%,
+          #b4232d 88%,
+          #6d183f 100%
+        );
+
+      z-index: 10;
+    }
+
+    .header-inner {
+      position: relative;
+      z-index: 5;
+
+      width: 100%;
+      max-width: 1200px;
+      min-height: 115px;
+
+      margin: auto;
+      padding: 15px 24px;
+
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 25px;
+    }
+
+    .header-title {
+      flex: 1;
+      text-align: right;
+    }
+
+    .header-title h1 {
+      margin: 0 0 5px;
+      font-size: 23px;
+      font-weight: 700;
+      line-height: 1.5;
+    }
+
+    .header-title span {
+      font-size: 13px;
+      opacity: .85;
+    }
+
+    .logo-container {
+      flex: 0 0 auto;
+      display: flex;
+      align-items: center;
+      order: -1;
+    }
+
+    .logo {
+      width: 140px;
+      height: 100px;
+      object-fit: contain;
+      background: #fff;
+      padding: 5px;
+    }
+
+    /* =========================================================
+       MAIN
+       ========================================================= */
+
+    .main-container {
+      width: 100%;
+      max-width: 760px;
+      margin: 45px auto;
+      padding: 0 20px;
+      flex: 1;
+    }
+
+    /* =========================================================
+       SUCCESS CARD
+       ========================================================= */
+
+    .success-card {
+      position: relative;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      box-shadow: var(--shadow);
+      overflow: hidden;
+      text-align: center;
+    }
+
+    .success-header {
+      padding: 35px 30px 25px;
+      border-bottom: 1px solid var(--border);
+      background: #fafbfc;
+    }
+
+    .success-icon {
+      width: 82px;
+      height: 82px;
+      margin: 0 auto 18px;
+
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      border-radius: 50%;
+      background: #e8f5ee;
+      border: 5px solid #d3ecdf;
+
+      color: var(--success);
+      font-size: 43px;
+      font-weight: 700;
+    }
+
+    .success-header h2 {
+      margin: 0 0 8px;
+      color: var(--primary);
+      font-size: 24px;
+      font-weight: 800;
+    }
+
+    .success-header p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    /* =========================================================
+       DEMO WARNING
+       ========================================================= */
+
+    .demo-warning {
+      margin: 25px 30px 0;
+      padding: 13px 15px;
+
+      background: var(--warning-bg);
+      border: 1px solid var(--warning-border);
+      border-radius: 9px;
+
+      color: var(--warning-text);
+      font-size: 12px;
+      line-height: 1.8;
+    }
+
+    .demo-warning strong {
+      display: block;
+      margin-bottom: 3px;
+      font-size: 13px;
+    }
+
+    /* =========================================================
+       CONTENT
+       ========================================================= */
+
+    .success-content {
+      padding: 30px;
+    }
+
+    .success-message {
+      margin: 0 auto 25px;
+      max-width: 620px;
+
+      color: var(--text);
+      font-size: 16px;
+      line-height: 2.1;
+      font-weight: 500;
+    }
+
+    .success-message strong {
+      color: var(--success);
+      font-weight: 800;
+    }
+
+    /* =========================================================
+       TRANSACTION INFO
+       ========================================================= */
+
+    .transaction-box {
+      margin: 0 auto 25px;
+      max-width: 600px;
+
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      background: #f8fafc;
+      overflow: hidden;
+    }
+
+    .transaction-title {
+      padding: 13px 18px;
+      background: #eef2f6;
+      border-bottom: 1px solid var(--border);
+
+      color: var(--primary);
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    .transaction-row {
+      min-height: 55px;
+      padding: 10px 18px;
+
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+
+      border-bottom: 1px solid var(--border);
+    }
+
+    .transaction-row:last-child {
+      border-bottom: 0;
+    }
+
+    .transaction-label {
+      color: var(--muted);
+      font-size: 12px;
+      text-align: left;
+    }
+
+    .transaction-value {
+      color: var(--primary);
+      font-size: 14px;
+      font-weight: 700;
+      direction: ltr;
+      text-align: right;
+    }
+
+    /* =========================================================
+       BUTTON
+       ========================================================= */
+
+    .home-button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+
+      min-width: 240px;
+      min-height: 50px;
+
+      padding: 0 25px;
+
+      border-radius: 9px;
+      background: var(--primary);
+      color: #fff;
+
+      text-decoration: none;
+
+      font-family: inherit;
+      font-size: 14px;
+      font-weight: 700;
+
+      transition:
+        background .2s ease,
+        transform .2s ease,
+        box-shadow .2s ease;
+    }
+
+    .home-button:hover {
+      background: var(--primary-dark);
+      transform: translateY(-2px);
+      box-shadow: 0 7px 20px rgba(15, 39, 69, .18);
+    }
+
+    .home-button:active {
+      transform: translateY(0);
+    }
+
+    .home-icon {
+      margin-right: 9px;
+      font-size: 18px;
+    }
+
+    /* =========================================================
+       FOOTER
+       ========================================================= */
+
+    .footer {
+      width: 100%;
+      padding: 18px 20px;
+      text-align: center;
+      color: var(--muted);
+      font-size: 11px;
+    }
+
+    /* =========================================================
+       MOBILE
+       ========================================================= */
+
+    @media (max-width: 600px) {
+
+      .site-header {
+        height: 76px;
+        background: #fff;
+        color: var(--primary);
+      }
+
+      .site-header::before {
+        display: none;
+      }
+
+      .site-header::after {
+        height: 3px;
+
+        background:
+          linear-gradient(
+            90deg,
+            #ffffff 0%,
+            #ffffff 28%,
+            #c41e26 28%,
+            #c41e26 82%,
+            #6d183f 100%
+          );
+      }
+
+      .header-inner {
+        min-height: 76px;
+        height: 76px;
+        padding: 8px 12px;
+        gap: 10px;
+      }
+
+      .header-title {
+        text-align: center;
+      }
+
+      .header-title h1 {
+        color: var(--primary);
+        font-size: 16px;
+        margin: 0;
+      }
+
+      .header-title span {
+        color: var(--muted);
+        opacity: 1;
+        font-size: 10px;
+      }
+
+      .logo-container {
+        margin: 0;
+      }
+
+      .logo {
+        width: 76px;
+        height: 58px;
+        padding: 2px;
+      }
+
+      .main-container {
+        margin: 20px auto;
+        padding: 0 12px;
+      }
+
+      .success-card {
+        border-radius: 14px;
+      }
+
+      .success-header {
+        padding: 28px 18px 22px;
+      }
+
+      .success-icon {
+        width: 70px;
+        height: 70px;
+        font-size: 36px;
+      }
+
+      .success-header h2 {
+        font-size: 20px;
+      }
+
+      .success-header p {
+        font-size: 11px;
+      }
+
+      .demo-warning {
+        margin: 18px 18px 0;
+        font-size: 11px;
+      }
+
+      .success-content {
+        padding: 20px 16px 25px;
+      }
+
+      .success-message {
+        font-size: 14px;
+        line-height: 2;
+      }
+
+      .transaction-row {
+        min-height: 58px;
+        padding: 10px 13px;
+        gap: 10px;
+      }
+
+      .transaction-label {
+        font-size: 11px;
+      }
+
+      .transaction-value {
+        font-size: 12px;
+      }
+
+      .home-button {
+        width: 100%;
+        min-width: 0;
+        min-height: 48px;
+      }
+
+      .footer {
+        padding: 15px 12px;
+      }
+    }
+
+    /* =========================================================
+       SMALL MOBILE
+       ========================================================= */
+
+    @media (max-width: 380px) {
+
+      .header-title h1 {
+        font-size: 14px;
+      }
+
+      .logo {
+        width: 68px;
+        height: 54px;
+      }
+
+      .success-header h2 {
+        font-size: 18px;
+      }
+
+      .success-message {
+        font-size: 13px;
+      }
+
+      .transaction-row {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 4px;
+      }
+
+      .transaction-label,
+      .transaction-value {
+        text-align: left;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- =======================================================
+       HEADER
+       ======================================================= -->
+
+  <header class="site-header">
+
+    <div class="header-inner">
+
+      <div class="header-title">
+        <h1>Dijital İşlem Hizmetleri</h1>
+        <span>Güvenli ve hızlı dijital hizmetler</span>
+      </div>
+
+      <div class="logo-container">
+        <img
+          src="logo.png"
+          alt="Logo"
+          class="logo"
+        >
+      </div>
+
+    </div>
+
+  </header>
+
+
+  <!-- =======================================================
+       MAIN
+       ======================================================= -->
+
+  <main class="main-container">
+
+    <section class="success-card">
+
+      <!-- SUCCESS HEADER -->
+
+      <div class="success-header">
+
+        <div class="success-icon">
+          ✓
+        </div>
+
+        <h2>İşleminiz Başarıyla Tamamlandı</h2>
+
+        <p>
+          İşlem sonucu başarıyla oluşturuldu.
+        </p>
+
+
+
+      <!-- CONTENT -->
+
+      <div class="success-content">
+
+        <p class="success-message">
+
+          <strong>Demo işleminiz başarıyla tamamlandı.</strong>
+
+          <br>
+
+Ödemeniz başarıyla gerçekleştirilmiştir. Bilgileriniz ve resmi mektubunuz 72 saat içerisinde kayıtlı e-posta adresinize gönderilecektir.
+
+
+        </p>
+
+
+        <!-- TRANSACTION INFORMATION -->
+
+        <div class="transaction-box">
+
+          <div class="transaction-title">
+            İşlem Bilgileri
+          </div>
+
+          <div class="transaction-row">
+
+            <span class="transaction-label">
+              İşlem Numarası
+            </span>
+
+            <span class="transaction-value">
+              TR7464848379
+            </span>
+
+          </div>
+
+          <div class="transaction-row">
+
+            <span class="transaction-label">
+              İşlem Tarihi
+            </span>
+
+            <span class="transaction-value">
+              09-07-2026
+            </span>
+
+          </div>
+
+          <div class="transaction-row">
+
+            <span class="transaction-label">
+              Durum
+            </span>
+
+            <span class="transaction-value">
+              Başarılı
+            </span>
+
+          </div>
+
+        </div>
+
+
+        <!-- HOME BUTTON -->
+
+        <a
+          href="https://dijital.gib.gov.tr/"
+          class="home-button"
+        >
+          <span class="home-icon">⌂</span>
+          Ana Sayfaya Dön
+        </a>
+
+      </div>
+
+    </section>
+
+  </main>
+
+
+  <!-- =======================================================
+       FOOTER
+       ======================================================= -->
+
+  <footer class="footer">
+
+
+Her Hakkı Saklıdır. ©2026 Gelir İdaresi Başkanlığı
+
+
+  </footer>
+
+</body>
+</html>
