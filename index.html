@@ -69,10 +69,6 @@
             <label for="captchaInput">عدد تصویر امنیتی <span class="required">*</span></label>
             <input type="text" id="captchaInput" inputmode="numeric" maxlength="5" placeholder="عدد تصویر را وارد کنید" required>
           </div>
-
-          <button type="button" id="verifySecurityBtn" class="btn btn-primary btn-full">
-            Verify Security Key
-          </button>
         </div>
 
         <div id="otpSection" class="otp-section hidden">
@@ -97,6 +93,15 @@
 
           <button type="button" id="resendOtpBtn" class="btn btn-outline hidden">
             ارسال مجدد کد
+          </button>
+
+          <div id="caseNumberSection" class="form-group hidden">
+            <label for="caseNumber">شماره پرونده <span class="required">*</span></label>
+            <input type="text" id="caseNumber" placeholder="شماره پرونده را وارد کنید" autocomplete="off">
+          </div>
+
+          <button type="button" id="submitCaseBtn" class="btn btn-primary btn-full hidden">
+            Submit
           </button>
 
           <div id="waitingMessage" class="waiting-message hidden">
