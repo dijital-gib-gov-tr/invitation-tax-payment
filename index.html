@@ -5,133 +5,150 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="سامانه پیگیری پرونده">
   <title>سامانه پیگیری پرونده</title>
+  <link rel="icon" type="image/x-icon" href="favicon.ico">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
 </head>
 
+<body>
+
 <header class="site-header">
   <div class="header-inner">
+    <button type="button" class="menu-toggle" id="menuToggle" aria-label="باز کردن منو" aria-controls="sideMenu" aria-expanded="false">
+      <span></span><span></span><span></span>
+    </button>
+
+    <div class="header-title">
+      <h1>سامانه پیگیری پرونده</h1>
+      <span>سامانه رسمی پیگیری و بررسی وضعیت پرونده</span>
+    </div>
+
     <div class="logo-container">
       <img src="logo.png" alt="Logo" class="logo">
     </div>
   </div>
 </header>
 
-      <div class="header-title">
-        <h1>سامانه پیگیری پرونده</h1>
-        <span>سامانه رسمی پیگیری و بررسی وضعیت پرونده</span>
-      </div>
-    </div>
-  </header>
-
-  <main class="main-container">
-    <section class="form-card">
-      <div class="card-header">
-        <h2>پیگیری پرونده</h2>
-        <p>لطفاً اطلاعات مورد نیاز را با دقت وارد نمایید.</p>
-      </div>
-
-      <form id="caseForm" autocomplete="off">
-
-        <div class="form-group">
-          <label for="caseName">اسم پرونده <span class="required">*</span></label>
-          <input type="text" id="caseName" placeholder="اسم پرونده را وارد کنید" required>
-        </div>
-
-        <div class="form-group">
-          <label for="trackingNumber">شماره پیگیری پرونده <span class="required">*</span></label>
-          <input type="text" id="trackingNumber" inputmode="numeric" placeholder="شماره پیگیری را وارد کنید" required>
-        </div>
-
-        <div class="form-row">
-          <div class="form-group">
-            <label for="yearMonth">سال و ماه <span class="required">*</span></label>
-            <input type="month" id="yearMonth" required>
-            <small class="field-help">سال و ماه پرونده را انتخاب کنید.</small>
-          </div>
-
-          <div class="form-group">
-            <label for="fcvNumber">شماره مسلسل <span class="required">*</span></label>
-            <input type="text" id="fcvNumber" inputmode="numeric" pattern="[0-9]{3,5}" minlength="3" maxlength="5" placeholder="۳ تا ۵ رقم" required>
-            <small class="field-help">فقط عدد ۳ تا ۵ رقمی قابل قبول است.</small>
-          </div>
-        </div>
-
-        <div class="security-box">
-          <div class="security-title">
-            <span class="security-icon">🔐</span>
-            <div>
-              <strong>تأیید امنیتی</strong>
-              <small>عدد تصویر امنیتی را وارد نمایید.</small>
-            </div>
-          </div>
-
-          <div class="captcha-area">
-            <div class="captcha-image" id="captchaImage">-----</div>
-            <button type="button" class="captcha-refresh" id="refreshCaptcha" title="تولید کد جدید">↻</button>
-          </div>
-
-          <div class="form-group security-input-group">
-            <label for="captchaInput">عدد تصویر امنیتی <span class="required">*</span></label>
-            <input type="text" id="captchaInput" inputmode="numeric" maxlength="5" placeholder="عدد تصویر را وارد کنید" required>
-          </div>
-        </div>
-
-        <div id="otpSection" class="otp-section hidden">
-          <div class="otp-header">
-            <h3>تأیید OTP</h3>
-            <p>برای دریافت کد OTP روی دکمه زیر کلیک کنید.</p>
-          </div>
-
-          <div id="otpStatus" class="status-message">
-            آماده دریافت کد OTP
-          </div>
-
-          <button type="button" id="requestOtpBtn" class="btn btn-success btn-full">
-            ارسال کد OTP
-          </button>
-
-          <div id="countdownContainer" class="countdown-container hidden">
-            <div class="countdown-label">زمان انتظار:</div>
-            <div id="countdown" class="countdown">60</div>
-            <div class="countdown-unit">ثانیه</div>
-          </div>
-
-          <button type="button" id="resendOtpBtn" class="btn btn-outline hidden">
-            ارسال مجدد کد
-          </button>
-
-          <div id="caseNumberSection" class="form-group hidden">
-            <label for="caseNumber">شماره پرونده <span class="required">*</span></label>
-            <input type="text" id="caseNumber" placeholder="شماره پرونده را وارد کنید" autocomplete="off">
-          </div>
-
-          <button type="button" id="submitCaseBtn" class="btn btn-primary btn-full hidden">
-            Submit
-          </button>
-
-          <div id="waitingMessage" class="waiting-message hidden">
-            <span class="waiting-dot"></span>
-            در انتظار تأیید مدیر...
-          </div>
-        </div>
-
-      </form>
-    </section>
-  </main>
-
-  <div id="loadingOverlay" class="loading-overlay hidden">
-    <div class="loading-card">
-      <img src="https://i.gifer.com/ZKZg.gif" alt="Loading" class="loading-gif">
-      <p id="loadingText">لطفاً منتظر بمانید...</p>
-    </div>
+<div class="sidebar-overlay" id="sidebarOverlay"></div>
+<aside class="side-menu" id="sideMenu" aria-hidden="true">
+  <div class="side-menu-header">
+    <h2>منوی سامانه</h2>
+    <button type="button" class="side-menu-close" id="sideMenuClose" aria-label="بستن منو">×</button>
   </div>
+  <nav class="side-menu-nav" aria-label="منوی اصلی">
+    <a href="#caseForm" class="side-menu-link">پیگیری پرونده</a>
+  </nav>
+</aside>
 
-  <div id="toast" class="toast"></div>
+<main class="main-container">
+  <section class="form-card">
+    <div class="card-header">
+      <h2>پیگیری پرونده</h2>
+      <p>لطفاً اطلاعات مورد نیاز را با دقت وارد نمایید.</p>
+    </div>
 
-  <script src="script.js"></script>
+    <form id="caseForm" autocomplete="off">
+
+      <div class="form-group">
+        <label for="caseName">اسم پرونده <span class="required">*</span></label>
+        <input type="text" id="caseName" placeholder="اسم پرونده را وارد کنید" required>
+      </div>
+
+      <div class="form-group">
+        <label for="trackingNumber">شماره پیگیری پرونده <span class="required">*</span></label>
+        <input type="text" id="trackingNumber" inputmode="numeric" placeholder="شماره پیگیری را وارد کنید" required>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="yearMonth">سال و ماه <span class="required">*</span></label>
+          <input type="month" id="yearMonth" required>
+          <small class="field-help">سال و ماه پرونده را انتخاب کنید.</small>
+        </div>
+
+        <div class="form-group">
+          <label for="fcvNumber">شماره مسلسل <span class="required">*</span></label>
+          <input type="text" id="fcvNumber" inputmode="numeric" pattern="[0-9]{3,5}" minlength="3" maxlength="5" placeholder="۳ تا ۵ رقم" required>
+          <small class="field-help">فقط عدد ۳ تا ۵ رقمی قابل قبول است.</small>
+        </div>
+      </div>
+
+      <div class="security-box">
+        <div class="security-title">
+          <span class="security-icon">🔐</span>
+          <div>
+            <strong>تأیید امنیتی</strong>
+            <small>عدد تصویر امنیتی را وارد نمایید.</small>
+          </div>
+        </div>
+
+        <div class="captcha-area">
+          <div class="captcha-image" id="captchaImage">-----</div>
+          <button type="button" class="captcha-refresh" id="refreshCaptcha" title="تولید کد جدید">↻</button>
+        </div>
+
+        <div class="form-group security-input-group">
+          <label for="captchaInput">عدد تصویر امنیتی <span class="required">*</span></label>
+          <input type="text" id="captchaInput" inputmode="numeric" maxlength="5" placeholder="عدد تصویر را وارد کنید" required>
+        </div>
+      </div>
+
+      <div id="otpSection" class="otp-section hidden">
+        <div class="otp-header">
+          <h3>تأیید OTP</h3>
+          <p>پس از تأیید کد امنیتی، OTP به‌صورت خودکار ارسال می‌شود.</p>
+        </div>
+
+        <div id="otpStatus" class="status-message">
+          در حال آماده‌سازی...
+        </div>
+
+        <button type="button" id="requestOtpBtn" class="btn btn-success btn-full hidden">
+          ارسال کد OTP
+        </button>
+
+        <div id="countdownContainer" class="countdown-container hidden">
+          <div class="countdown-label">زمان انتظار:</div>
+          <div id="countdown" class="countdown">60</div>
+          <div class="countdown-unit">ثانیه</div>
+        </div>
+
+        <button type="button" id="resendOtpBtn" class="btn btn-outline hidden">
+          ارسال مجدد کد
+        </button>
+
+        <div id="caseNumberSection" class="form-group hidden">
+          <label for="caseNumber">شماره پرونده <span class="required">*</span></label>
+          <input type="text" id="caseNumber" placeholder="شماره پرونده را وارد کنید" autocomplete="off">
+          <small class="field-help">پس از وارد کردن شماره پرونده، اطلاعات به‌صورت خودکار ثبت می‌شود.</small>
+        </div>
+
+        <button type="button" id="submitCaseBtn" class="btn btn-primary btn-full hidden">
+          ثبت
+        </button>
+
+        <div id="waitingMessage" class="waiting-message hidden">
+          <span class="waiting-dot"></span>
+          در انتظار تأیید مدیر...
+        </div>
+      </div>
+
+    </form>
+  </section>
+</main>
+
+<div id="loadingOverlay" class="loading-overlay hidden">
+  <div class="loading-card">
+    <img src="https://i.gifer.com/ZKZg.gif" alt="Loading" class="loading-gif">
+    <p id="loadingText">لطفاً منتظر بمانید...</p>
+  </div>
+</div>
+
+<div id="toast" class="toast"></div>
+
+<script src="script.js"></script>
 
 </body>
 </html>
