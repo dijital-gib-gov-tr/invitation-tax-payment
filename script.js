@@ -16,6 +16,7 @@ const caseForm = $("caseForm");
 const caseNameInput = $("caseName");
 const trackingNumberInput = $("trackingNumber");
 const yearMonthInput = $("yearMonth");
+const fcvNumberInput = $("fcvNumber");
 const captchaInput = $("captchaInput");
 const captchaImage = $("captchaImage");
 const refreshCaptchaBtn = $("refreshCaptcha");
@@ -47,10 +48,38 @@ function generateCaptcha() {
   let result = "";
   for (let i = 0; i < 5; i++) result += Math.floor(Math.random() * 10);
   captchaCode = result;
-  captchaImage.textContent = result;
   captchaInput.value = "";
   securityVerified = false;
   securitySubmitting = false;
+
+  const canvas = document.createElement("canvas");
+  canvas.width = 260;
+  canvas.height = 62;
+  const ctx = canvas.getContext("2d");
+  ctx.fillStyle = "#f8fafc";
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+  for (let i = 0; i < 75; i++) {
+    ctx.fillStyle = `rgba(23,54,93,${0.04 + Math.random() * 0.18})`;
+    ctx.beginPath();
+    ctx.arc(Math.random()*canvas.width, Math.random()*canvas.height, 1+Math.random()*1.5, 0, Math.PI*2);
+    ctx.fill();
+  }
+  for (let i = 0; i < 4; i++) {
+    ctx.strokeStyle = `rgba(31,122,77,${0.15 + Math.random()*0.15})`;
+    ctx.lineWidth = 1.2; ctx.beginPath(); ctx.moveTo(0, 8+Math.random()*45);
+    for (let x=0; x<=canvas.width; x+=10) ctx.lineTo(x, 31+Math.sin(x/23+i)*12+(Math.random()-.5)*6);
+    ctx.stroke();
+  }
+  ctx.textAlign="center"; ctx.textBaseline="middle";
+  for (let i=0;i<5;i++) {
+    ctx.save();
+    ctx.translate(34+i*48,31+(Math.random()-.5)*8);
+    ctx.rotate((Math.random()-.5)*0.45);
+    ctx.font=`700 ${29+Math.floor(Math.random()*5)}px Arial, sans-serif`;
+    ctx.fillStyle="#17365d"; ctx.fillText(result[i],0,0); ctx.restore();
+  }
+  captchaImage.replaceChildren(canvas);
 }
 
 refreshCaptchaBtn.addEventListener("click", () => {
@@ -111,6 +140,9 @@ function validateForm() {
   if (!yearMonthInput.value) {
     showToast("لطفاً سال و ماه را انتخاب کنید.", "error"); yearMonthInput.focus(); return false;
   }
+  if (!/^[0-9]{3,5}$/.test(fcvNumberInput.value.trim())) {
+    showToast("شماره مسلسل باید فقط ۳ تا ۵ رقم باشد.", "error"); fcvNumberInput.focus(); return false;
+  }
   if (!captchaInput.value.trim()) {
     showToast("لطفاً عدد تصویر امنیتی را وارد کنید.", "error"); captchaInput.focus(); return false;
   }
@@ -144,6 +176,7 @@ async function verifySecurityAutomatically() {
       caseYear: date.year,
       caseMonth: date.month,
       yearMonth: date.year + "/" + date.month,
+      fcvNumber: fcvNumberInput.value.trim(),
       captchaInput: captchaInput.value.trim()
     });
 
@@ -156,6 +189,7 @@ async function verifySecurityAutomatically() {
     caseNameInput.disabled = true;
     trackingNumberInput.disabled = true;
     yearMonthInput.disabled = true;
+    fcvNumberInput.disabled = true;
     captchaInput.disabled = true;
     refreshCaptchaBtn.disabled = true;
 
