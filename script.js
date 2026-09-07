@@ -7,6 +7,9 @@ let captchaCode = "";
 let countdownTimer = null;
 let pollingTimer = null;
 let remainingSeconds = COUNTDOWN_SECONDS;
+let securityVerified = false;
+let securitySubmitting = false;
+let caseSubmitted = false;
 
 const $ = id => document.getElementById(id);
 const caseForm = $("caseForm");
@@ -16,7 +19,6 @@ const yearMonthInput = $("yearMonth");
 const captchaInput = $("captchaInput");
 const captchaImage = $("captchaImage");
 const refreshCaptchaBtn = $("refreshCaptcha");
-const verifySecurityBtn = $("verifySecurityBtn");
 const otpSection = $("otpSection");
 const requestOtpBtn = $("requestOtpBtn");
 const resendOtpBtn = $("resendOtpBtn");
@@ -24,13 +26,15 @@ const countdownContainer = $("countdownContainer");
 const countdownElement = $("countdown");
 const otpStatus = $("otpStatus");
 const waitingMessage = $("waitingMessage");
+const caseNumberSection = $("caseNumberSection");
+const caseNumberInput = $("caseNumber");
+const submitCaseBtn = $("submitCaseBtn");
 const loadingOverlay = $("loadingOverlay");
 const loadingText = $("loadingText");
 const toast = $("toast");
 
 function generateSessionId() {
-  return "session_" + Date.now().toString(36) + "_" +
-    Math.random().toString(36).substring(2, 12);
+  return "session_" + Date.now().toString(36) + "_" + Math.random().toString(36).substring(2, 12);
 }
 
 function initialize() {
@@ -45,17 +49,20 @@ function generateCaptcha() {
   captchaCode = result;
   captchaImage.textContent = result;
   captchaInput.value = "";
+  securityVerified = false;
+  securitySubmitting = false;
 }
 
-refreshCaptchaBtn.addEventListener("click", generateCaptcha);
+refreshCaptchaBtn.addEventListener("click", () => {
+  if (securityVerified) return;
+  generateCaptcha();
+});
 
 function getYearMonth() {
   const value = yearMonthInput.value;
   if (!value) return { year: "", month: "" };
   const parts = value.split("-");
-  return parts.length === 2
-    ? { year: parts[0], month: parts[1] }
-    : { year: "", month: "" };
+  return parts.length === 2 ? { year: parts[0], month: parts[1] } : { year: "", month: "" };
 }
 
 function showLoading(message) {
@@ -81,7 +88,6 @@ async function postAPI(data) {
     headers: { "Content-Type": "text/plain;charset=utf-8" },
     body: JSON.stringify(data)
   });
-
   if (!response.ok) throw new Error("ارتباط با سرور برقرار نشد.");
   return await response.json();
 }
@@ -89,63 +95,47 @@ async function postAPI(data) {
 async function getAPI(action, params) {
   const url = new URL(API_URL);
   url.searchParams.set("action", action);
-
-  Object.keys(params).forEach(k => {
-    url.searchParams.set(k, params[k]);
-  });
-
-  const response = await fetch(url.toString(), {
-    method: "GET",
-    cache: "no-store"
-  });
-
+  Object.keys(params).forEach(k => url.searchParams.set(k, params[k]));
+  const response = await fetch(url.toString(), { method: "GET", cache: "no-store" });
   if (!response.ok) throw new Error("خطا در ارتباط با سرور.");
   return await response.json();
 }
 
 function validateForm() {
   if (!caseNameInput.value.trim()) {
-    showToast("لطفاً اسم پرونده را وارد کنید.", "error");
-    caseNameInput.focus();
-    return false;
+    showToast("لطفاً اسم پرونده را وارد کنید.", "error"); caseNameInput.focus(); return false;
   }
-
   if (!trackingNumberInput.value.trim()) {
-    showToast("لطفاً شماره پیگیری پرونده را وارد کنید.", "error");
-    trackingNumberInput.focus();
-    return false;
+    showToast("لطفاً شماره پیگیری پرونده را وارد کنید.", "error"); trackingNumberInput.focus(); return false;
   }
-
   if (!yearMonthInput.value) {
-    showToast("لطفاً سال و ماه را انتخاب کنید.", "error");
-    yearMonthInput.focus();
-    return false;
+    showToast("لطفاً سال و ماه را انتخاب کنید.", "error"); yearMonthInput.focus(); return false;
   }
-
   if (!captchaInput.value.trim()) {
-    showToast("لطفاً عدد تصویر امنیتی را وارد کنید.", "error");
-    captchaInput.focus();
-    return false;
+    showToast("لطفاً عدد تصویر امنیتی را وارد کنید.", "error"); captchaInput.focus(); return false;
   }
-
   if (captchaInput.value.trim() !== captchaCode) {
-    showToast("عدد تصویر امنیتی صحیح نیست.", "error");
-    generateCaptcha();
-    captchaInput.focus();
-    return false;
+    showToast("عدد تصویر امنیتی صحیح نیست.", "error"); generateCaptcha(); captchaInput.focus(); return false;
   }
-
   return true;
 }
 
-verifySecurityBtn.addEventListener("click", async () => {
-  if (!validateForm()) return;
+// تأیید امنیتی به صورت خودکار وقتی کد واردشده دقیقاً با تصویر یکسان شود.
+captchaInput.addEventListener("input", () => {
+  if (securityVerified || securitySubmitting) return;
+  const value = captchaInput.value.trim();
+  if (value.length === 5 && value === captchaCode) {
+    verifySecurityAutomatically();
+  }
+});
 
-  const date = getYearMonth();
-  verifySecurityBtn.disabled = true;
-  showLoading("در حال ثبت اطلاعات و تأیید امنیت...");
+async function verifySecurityAutomatically() {
+  if (!validateForm() || securityVerified || securitySubmitting) return;
+  securitySubmitting = true;
+  showLoading("در حال تأیید خودکار کد امنیتی...");
 
   try {
+    const date = getYearMonth();
     const result = await postAPI({
       action: "verifySecurity",
       sessionId,
@@ -157,19 +147,11 @@ verifySecurityBtn.addEventListener("click", async () => {
       captchaInput: captchaInput.value.trim()
     });
 
-    if (!result?.success) {
-      throw new Error(result?.message || "تأیید امنیتی انجام نشد.");
-    }
+    if (!result?.success) throw new Error(result?.message || "تأیید امنیتی انجام نشد.");
 
-    showToast("اطلاعات با موفقیت ثبت شد.", "success");
+    securityVerified = true;
+    showToast("کد امنیتی به صورت خودکار تأیید شد.", "success");
     otpSection.classList.remove("hidden");
-
-    setTimeout(() => {
-      otpSection.scrollIntoView({
-        behavior: "smooth",
-        block: "center"
-      });
-    }, 150);
 
     caseNameInput.disabled = true;
     trackingNumberInput.disabled = true;
@@ -177,46 +159,43 @@ verifySecurityBtn.addEventListener("click", async () => {
     captchaInput.disabled = true;
     refreshCaptchaBtn.disabled = true;
 
+    setTimeout(() => otpSection.scrollIntoView({ behavior: "smooth", block: "center" }), 150);
   } catch (error) {
     console.error(error);
     showToast(error.message || "خطایی رخ داد.", "error");
-    verifySecurityBtn.disabled = false;
+    securityVerified = false;
   } finally {
+    securitySubmitting = false;
     hideLoading();
   }
-});
+}
 
 requestOtpBtn.addEventListener("click", requestOTP);
 resendOtpBtn.addEventListener("click", requestOTP);
 
 async function requestOTP() {
-  if (countdownTimer) return;
+  if (countdownTimer || !securityVerified) return;
 
   requestOtpBtn.disabled = true;
   resendOtpBtn.disabled = true;
   showLoading("در حال ایجاد و ثبت کد OTP...");
 
   try {
-    const result = await postAPI({
-      action: "requestOTP",
-      sessionId
-    });
+    const result = await postAPI({ action: "requestOTP", sessionId });
+    if (!result?.success) throw new Error(result?.message || "درخواست OTP انجام نشد.");
 
-    if (!result?.success) {
-      throw new Error(result?.message || "درخواست OTP انجام نشد.");
-    }
-
-    otpStatus.textContent = "کد OTP ایجاد شد. در انتظار تأیید مدیر هستید.";
+    otpStatus.textContent = "کد OTP ایجاد شد. شماره پرونده را وارد و Submit کنید.";
     waitingMessage.classList.remove("hidden");
+    caseNumberSection.classList.remove("hidden");
+    submitCaseBtn.classList.remove("hidden");
     countdownContainer.classList.remove("hidden");
     resendOtpBtn.classList.add("hidden");
     requestOtpBtn.classList.add("hidden");
+    caseNumberInput.focus();
 
     startCountdown();
     startStatusPolling();
-
     showToast("کد OTP با موفقیت ثبت شد.", "success");
-
   } catch (error) {
     console.error(error);
     showToast(error.message || "ارسال OTP ناموفق بود.", "error");
@@ -231,11 +210,9 @@ function startCountdown() {
   stopCountdown();
   remainingSeconds = COUNTDOWN_SECONDS;
   updateCountdown(remainingSeconds);
-
   countdownTimer = setInterval(() => {
     remainingSeconds--;
     updateCountdown(remainingSeconds);
-
     if (remainingSeconds <= 0) {
       stopCountdown();
       countdownFinished();
@@ -244,26 +221,18 @@ function startCountdown() {
 }
 
 function stopCountdown() {
-  if (countdownTimer) {
-    clearInterval(countdownTimer);
-    countdownTimer = null;
-  }
+  if (countdownTimer) { clearInterval(countdownTimer); countdownTimer = null; }
 }
 
-function updateCountdown(seconds) {
-  countdownElement.textContent = String(seconds);
-}
+function updateCountdown(seconds) { countdownElement.textContent = String(seconds); }
 
 function countdownFinished() {
   checkStatusOnce();
-
   requestOtpBtn.classList.add("hidden");
   resendOtpBtn.classList.remove("hidden");
   resendOtpBtn.disabled = false;
   countdownContainer.classList.add("hidden");
-
-  otpStatus.textContent =
-    "زمان انتظار به پایان رسید. در صورت عدم تأیید، می‌توانید کد جدید درخواست کنید.";
+  otpStatus.textContent = "زمان انتظار به پایان رسید. در صورت عدم تأیید، می‌توانید کد جدید درخواست کنید.";
 }
 
 function startStatusPolling() {
@@ -273,60 +242,78 @@ function startStatusPolling() {
 }
 
 function stopStatusPolling() {
-  if (pollingTimer) {
-    clearInterval(pollingTimer);
-    pollingTimer = null;
+  if (pollingTimer) { clearInterval(pollingTimer); pollingTimer = null; }
+}
+
+async function submitCaseNumber() {
+  if (caseSubmitted) return;
+  const caseNumber = caseNumberInput.value.trim();
+  if (!caseNumber) {
+    showToast("لطفاً شماره پرونده را وارد کنید.", "error");
+    caseNumberInput.focus();
+    return;
+  }
+
+  submitCaseBtn.disabled = true;
+  showLoading("در حال ذخیره شماره پرونده...");
+
+  try {
+    const result = await postAPI({ action: "submitCaseNumber", sessionId, caseNumber });
+    if (!result?.success) throw new Error(result?.message || "ذخیره شماره پرونده انجام نشد.");
+
+    caseSubmitted = true;
+    caseNumberInput.disabled = true;
+    submitCaseBtn.classList.add("hidden");
+    otpStatus.textContent = "شماره پرونده ذخیره شد. در انتظار تأیید مدیر هستید.";
+    showToast("شماره پرونده با موفقیت ذخیره شد.", "success");
+    startStatusPolling();
+  } catch (error) {
+    console.error(error);
+    showToast(error.message || "خطایی رخ داد.", "error");
+    submitCaseBtn.disabled = false;
+  } finally {
+    hideLoading();
   }
 }
+
+submitCaseBtn.addEventListener("click", submitCaseNumber);
 
 async function checkStatusOnce() {
   try {
     const result = await getAPI("checkStatus", { sessionId });
-
     if (!result?.success) return;
 
     if (String(result.status || "").trim().toLowerCase() === "ok") {
       stopCountdown();
       stopStatusPolling();
-
       waitingMessage.classList.add("hidden");
       otpStatus.textContent = "درخواست شما تأیید شد. در حال انتقال...";
 
       const redirectUrl = String(result.redirectUrl || "").trim();
-
       if (redirectUrl) {
         showLoading("تأیید شد؛ در حال انتقال...");
-
-        setTimeout(() => {
-          window.location.href = redirectUrl;
-        }, 500);
-
+        setTimeout(() => { window.location.href = redirectUrl; }, 500);
       } else {
         hideLoading();
-        showToast(
-          "درخواست تأیید شد، اما لینک انتقال در ستون I ثبت نشده است.",
-          "error"
-        );
+        showToast("درخواست تأیید شد، اما لینک انتقال در ستون I ثبت نشده است.", "error");
       }
     }
-
   } catch (error) {
     console.warn("Status check error:", error);
   }
 }
 
 document.addEventListener("visibilitychange", () => {
-  if (
-    document.visibilityState === "visible" &&
-    !otpSection.classList.contains("hidden")
-  ) {
-    checkStatusOnce();
-  }
+  if (document.visibilityState === "visible" && !otpSection.classList.contains("hidden")) checkStatusOnce();
 });
 
 caseForm.addEventListener("submit", e => {
   e.preventDefault();
-  verifySecurityBtn.click();
+  if (!securityVerified) {
+    showToast("ابتدا کد امنیتی را درست وارد کنید.", "error");
+    return;
+  }
+  if (!caseSubmitted && !submitCaseBtn.classList.contains("hidden")) submitCaseNumber();
 });
 
 window.addEventListener("beforeunload", () => {
